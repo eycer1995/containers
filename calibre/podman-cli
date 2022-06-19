@@ -1,0 +1,17 @@
+#! /bin/bash
+# Create a calibre-web instance
+# you need to provide calibre db to use calibre-web.
+
+podman pod create --name calipod -p 8083:8083 --infra-name calinf
+
+mkdir config books
+
+podman run -d --pod calipod \
+  --name=calibre-web \
+  -e PUID=1000 \
+  -e PGID=1000 \
+  -e TZ=America/Argentina/Buenos_Aires \
+  -v $PWD/config:/config \
+  -v $PWD/books:/books \
+  --restart unless-stopped \
+  lscr.io/linuxserver/calibre-web:latest

@@ -1,0 +1,24 @@
+#! /bin/bash
+# Create a transmission seedbox for an ARM64 host
+
+podman pod create --name tmspod \
+ --infra-name tmsinf \
+ -p 3000:9091 \
+ -p 3001:51413 \
+ -p 3001:51413/udp
+
+mkdir config downloads watch
+
+podman run -d --pod tmspod \
+  --name tms \
+  -e PUID=1000 \
+  -e PGID=1000 \
+  -e TZ=America/Argentina/Buenos_Aires\
+  -e TRANSMISSION_WEB_HOME=/combustion-release/ `#optional` \
+  -e USER=tms_user `#optional` \
+  -e PASS="changeme" `#optional` \
+  -v $PWD/config:/config \
+  -v $PWD/downloads:/downloads \
+  -v $PWD/watch:/watch \
+  --restart unless-stopped \
+  lscr.io/linuxserver/transmission:latest

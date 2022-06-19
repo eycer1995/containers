@@ -1,0 +1,18 @@
+#! /bin/bash
+# Create a nodered and mosquitto instance
+
+podman pod create --name iotpod --infra-name iotinf \
+ -p 1880:1880 \
+ -p 1883:1883 \
+ -p 9001:9001 \
+
+podman run -d --pod iotpod \
+ --name nodered \
+ -v node_red_data:/data \
+ nodered/node-red
+
+podman run -d --pod iotpod \
+ -v mosquitto.conf:/mosquitto/config/mosquitto.conf \
+ -v /mosquitto/data \
+ -v /mosquitto/log \
+docker.io/library/eclipse-mosquitto

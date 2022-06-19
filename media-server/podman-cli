@@ -1,0 +1,67 @@
+#! /bin/bash
+# Create a full home media server for ARM64 host
+# apps > jellyfin, transmission, sonarr, jackett.
+
+podman pod create --name mediapod --infra-name mediainf \
+ -p 9091:9091 -p 51413:51413 -p 51413:51413/udp `#transmission ports` \
+ -p 8096:8096 -p 8920:8920 -p 7359:7359 -p 1900:1900 `#jellyfin ports` \
+ -p 8989:8989 `#sonarr ports`
+ -p 9117:9117 `#jackett ports`
+
+mkdir -p jellyfin/{config,tvseries,movies,anime}
+mkdir -p transmission/{config,downloads,watch}
+mkdir -p sonarr/config
+mkdir -p jackett/config
+
+podman run -d --pod mediapod \
+  --name=jellyfin \
+  -e PUID=1000 \
+  -e PGID=1000 \
+  -e TZ=America/Argentina/Buenos_Aires \
+  -v $PWD/jellyfin/config:/config \
+  -v $PWD/jellyfin/tvseries:/data/tvshows \
+  -v $PWD/jellyfin/movies:/data/movies \
+  -v $PWD/jellyfin/anime/:/data/anime \
+  --restart unless-stopped \
+  lscr.io/linuxserver/jellyfin:arm64v8-10.7.7
+
+podman run -d --pod mediapod \
+  --name=transmission \
+  -e PUID=1000 \
+  -e PGID=1000 \
+  -e TZ=America/Argentina/Buenos_Aires \
+  -e TRANSMISSION_WEB_HOME=/combustion-release/ `#optional` \
+  -e USER=transmission_user `#optional` \
+  -e PASS=changeme `#optional` \
+  -e WHITELIST=iplist `#optional` \
+  -e PEERPORT=peerport `#optional` \
+  -e HOST_WHITELIST=dnsname list `#optional` \
+  -v $PWD/transmission/config:/config \
+  -v $PWD/transmission/downloads:/downloads \
+  -v $PWD/transmission/watch:/watch \
+  --restart unless-stopped \
+linuxserver/transmission:version-3.00-r5
+
+podman run -d --pod mediapod \
+  --name=sonarr \
+  -e PUID=1000 \
+  -e PGID=1000 \
+  -e TZ=America/Argentina/Buenos_Aires \
+  -v $PWD/sonarr/config:/config \
+  -v $PWD/jellyfin/tvseries:/tv `#optional` \
+  -v $PWD/transmission/downloads:/downloads `#optional` \
+  --restart unless-stopped \
+  lscr.io/linuxserver/sonarr:arm64v8-3.0.8
+
+podman run -d --pod mediapod \
+  --name=jackett \
+  -e PUID=1000 \
+  -e PGID=1000 \
+  -e TZ=America/Argentina/Buenos_Aires \
+  -e AUTO_UPDATE=true `#optional` \
+  -e RUN_OPTS=<run options here> `#optional` \
+  -p 9117:9117 \
+  -v $PWD/jackett/config:/config \
+  -v $PWD/transmission/downloads:/downloads \
+  --restart unless-stopped \
+  lscr.io/linuxserver/jackett:latest

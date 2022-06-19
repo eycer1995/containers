@@ -1,0 +1,8 @@
+#! /bin/bash
+# Create a focalboard instance for ARM64 host
+
+podman pod create --name focalpod -p 8000:8000 --infra-name focalinf
+
+podman run -d --pod focalpod \
+ --name focalboard \
+ nicoulaj/focalboard

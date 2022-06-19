@@ -1,0 +1,47 @@
+#! /bin/bash
+# Create a bookstack instance for ARM64
+
+# Create the books pod
+podman pod create --name books \
+ --infra-name booksinf \
+ -p 6875:80 \
+ -p 3306:3306
+
+mkdir data 
+
+# Bookstack container
+# APP_URL has to be the complete URL e.g
+# https://192.168.0.200:8080
+# http://example.com:port
+podman run -d --pod books \
+ -e PUID=1000 \
+ -e PGID=1000 \
+ -e APP_URL="" \
+ -e DB_HOST=book_host \
+ -e DB_USER=book_user \
+ -e DB_PASS="changeme" \
+ -e DB_DATABASE=book_db \
+ -v $PWD/data:/config \
+ --restart unless-stopped \
+ --name bookstack \
+lscr.io/linuxserver/bookstack:arm64v8-22.04.2 
+
+# Mariadb container
+# If /my/custom/config-file.cnf is the path and name of 
+# your custom configuration file, you can start your mariadb 
+# container like this (note that only the directory path 
+# of the custom config file is used in this command):
+# -v /my/custom:/etc/mysql/conf.d
+
+podman run -d --pod books \
+ --name book_host \
+ -e PUID=1000 \
+ -e PGID=1000 \
+ -e MYSQL_ROOT_PASSWORD="changeme" \
+ -e TZ=America/Argentina/Buenos_Aires \
+ -e MYSQL_DATABASE=book_db \
+ -e MYSQL_USER=book_user \
+ -e MYSQL_PASSWORD="changeme" \
+ -v $PWD/data:/config \
+ --restart unless-stopped \ 
+ docker.io/library/mariadb
