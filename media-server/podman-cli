@@ -2,11 +2,14 @@
 # Create a full home media server for ARM64 host
 # apps > jellyfin, transmission, sonarr, jackett.
 
-podman pod create --name mediapod --infra-name mediainf \
+podman pod create --name mediapod \
  -p 9091:9091 -p 51413:51413 -p 51413:51413/udp `#transmission ports` \
  -p 8096:8096 -p 8920:8920 -p 7359:7359 -p 1900:1900 `#jellyfin ports` \
- -p 8989:8989 `#sonarr ports`
- -p 9117:9117 `#jackett ports`
+ -p 8989:8989 `#sonarr ports` \
+ -p 9117:9117 `#jackett ports` \
+ -p 7878:7878 `#radarr ports` 
+
+# podman rename <mediapodinfra> mediainf
 
  sudo ufw allow 9091
  sudo ufw allow 51413
@@ -59,6 +62,17 @@ podman run -d --pod mediapod \
   -v $PWD/transmission/downloads:/downloads `#optional` \
   --restart unless-stopped \
   lscr.io/linuxserver/sonarr:arm64v8-3.0.8
+
+podman run -d --pod mediapod \
+  --name=radarr \
+  -e PUID=1000 \
+  -e PGID=1000 \
+  -e TZ=America/Argentina/Buenos_Aires \
+  -v $PWD/radarr/config:/config \
+  -v $PWD/jellyfin/movies:/movies `#optional` \
+  -v $PWD/transmission/downloads:/downloads `#optional` \
+  --restart unless-stopped \
+  lscr.io/linuxserver/radarr:arm64v8-4.1.0
 
 podman run -d --pod mediapod \
   --name=jackett \
