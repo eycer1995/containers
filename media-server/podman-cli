@@ -8,6 +8,16 @@ podman pod create --name mediapod --infra-name mediainf \
  -p 8989:8989 `#sonarr ports`
  -p 9117:9117 `#jackett ports`
 
+ sudo ufw allow 9091
+ sudo ufw allow 51413
+ sudo ufw allow 8096
+ sudo ufw allow 8920
+ sudo ufw allow 7359
+ sudo ufw allow 1900
+ sudo ufw allow 8989
+ sudo ufw allow 9117
+
+
 mkdir -p jellyfin/{config,tvseries,movies,anime}
 mkdir -p transmission/{config,downloads,watch}
 mkdir -p sonarr/config
@@ -31,16 +41,13 @@ podman run -d --pod mediapod \
   -e PGID=1000 \
   -e TZ=America/Argentina/Buenos_Aires \
   -e TRANSMISSION_WEB_HOME=/combustion-release/ `#optional` \
-  -e USER=transmission_user `#optional` \
-  -e PASS=changeme `#optional` \
-  -e WHITELIST=iplist `#optional` \
-  -e PEERPORT=peerport `#optional` \
-  -e HOST_WHITELIST=dnsname list `#optional` \
+  -e USER=tms_user `#optional` \
+  -e PASS="changeme" `#optional` \
   -v $PWD/transmission/config:/config \
   -v $PWD/transmission/downloads:/downloads \
   -v $PWD/transmission/watch:/watch \
   --restart unless-stopped \
-linuxserver/transmission:version-3.00-r5
+linuxserver/transmission:latest
 
 podman run -d --pod mediapod \
   --name=sonarr \
@@ -48,7 +55,7 @@ podman run -d --pod mediapod \
   -e PGID=1000 \
   -e TZ=America/Argentina/Buenos_Aires \
   -v $PWD/sonarr/config:/config \
-  -v $PWD/jellyfin/tvseries:/tv `#optional` \
+  -v $PWD/jellyfin/anime:/tv `#optional` \
   -v $PWD/transmission/downloads:/downloads `#optional` \
   --restart unless-stopped \
   lscr.io/linuxserver/sonarr:arm64v8-3.0.8
@@ -59,8 +66,6 @@ podman run -d --pod mediapod \
   -e PGID=1000 \
   -e TZ=America/Argentina/Buenos_Aires \
   -e AUTO_UPDATE=true `#optional` \
-  -e RUN_OPTS=<run options here> `#optional` \
-  -p 9117:9117 \
   -v $PWD/jackett/config:/config \
   -v $PWD/transmission/downloads:/downloads \
   --restart unless-stopped \
