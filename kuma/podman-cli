@@ -1,0 +1,14 @@
+#! /bin/bash
+
+podman pod create -p 7070:3001 --name kumapod
+
+infraname="$(podman pod ps | grep kumapod | awk '{print $1}')""-infra"
+
+podman rename $infraname "kumainf"
+
+mkdir data
+
+podman run -d --pod kumapod \
+ -v $PWD/data:/app/data \
+--restart always \
+louislam/uptime-kuma:lastest

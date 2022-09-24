@@ -1,0 +1,18 @@
+#! /bin/bash
+
+podman pod create -p 7501:8080 --name komgapod
+
+sudo ufw allow 7501
+
+# --mount type=bind,source=/path/to/config,target=/config \
+# --mount type=bind,source=/path/to/data,target=/data \
+
+mkdir komgaconfig
+
+podman run -d --pod komgapod \
+  --name=komga \
+  --user 1000:1000 \
+  -v $PWD/komgaconfig:/config \
+  -v $PWD/downloads/complete:/data \
+  --restart unless-stopped \
+  gotson/komga

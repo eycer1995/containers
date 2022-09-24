@@ -1,0 +1,21 @@
+#! /bin/bash
+
+podman pod create --name ncpod \
+-p 7001:443
+
+mkdir -p /mnt/nextcloud/{appdata,data}
+cd /mnt/nextcloud
+
+sudo ufw allow 7001
+
+podman run -d --pod ncpod \
+  --name=nextcloud \
+  -e PUID=1000 \
+  -e PGID=1000 \
+  -e TZ=America/Argentina/Buenos_Aires \
+  -v $PWD/appdata:/config \
+  -v $PWD/data:/data \
+  --restart unless-stopped \
+lscr.io/linuxserver/nextcloud:arm64v8-24.0.4
+
+# highly recommended to provide a MySQL db.

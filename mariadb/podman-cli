@@ -1,0 +1,21 @@
+#! /bin/bash
+
+podman pod create --name mariapod \
+-p 3306:3306
+
+mkdir mysql_data
+
+podman run -d --pod mariapod \
+ --name mariadb \
+ -e PUID=1000 \
+ -e PGID=1000 \
+ -e MYSQL_ROOT_PASSWORD="changeme" \
+ -e TZ=America/Argentina/Buenos_Aires \
+ -e MYSQL_DATABASE=db_name \
+ -e MYSQL_USER=db_user \
+ -e MYSQL_PASSWORD="changeme" \
+ -v $PWD/mysql_data:/config \
+ --restart unless-stopped \ 
+ docker.io/linuxserver/mariadb:arm64v8-latest
+ # for some reason it doesn't recognizes the URL:tag, i had to use the ID
+

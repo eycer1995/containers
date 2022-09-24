@@ -11,17 +11,18 @@ podman pod create --name mediapod \
 
 # podman rename <mediapodinfra> mediainf
 
- sudo ufw allow 9091
- sudo ufw allow 51413
- sudo ufw allow 8096
- sudo ufw allow 8920
- sudo ufw allow 7359
- sudo ufw allow 1900
- sudo ufw allow 8989
- sudo ufw allow 9117
+sudo ufw allow 9091
+sudo ufw allow 51413
+sudo ufw allow 8096
+sudo ufw allow 8920
+sudo ufw allow 7359
+sudo ufw allow 1900
+sudo ufw allow 8989
+sudo ufw allow 9117
+sudo ufw allow 7878
 
-
-mkdir -p jellyfin/{config,tvseries,movies,anime}
+# Create all folder scheme
+mkdir -p jellyfin/{config,tvseries,movies,anime,animovies,ani2,ani3}
 mkdir -p transmission/{config,downloads,watch}
 mkdir -p sonarr/config
 mkdir -p jackett/config
@@ -35,6 +36,9 @@ podman run -d --pod mediapod \
   -v $PWD/jellyfin/tvseries:/data/tvshows \
   -v $PWD/jellyfin/movies:/data/movies \
   -v $PWD/jellyfin/anime/:/data/anime \
+  -v $PWD/jellyfin/animovies:/data/animovies \
+  -v $PWD/jellyfin/ani2/:/data/ani2 \
+  -v $PWD/jellyfin/ani3/:/data/ani3 \
   --restart unless-stopped \
   lscr.io/linuxserver/jellyfin:arm64v8-10.7.7
 
