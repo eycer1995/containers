@@ -1,0 +1,24 @@
+#! /bin/bash
+
+podman pod create --name monipod -p 8125:8125 -p 8086:8086 -p 3000:3000
+
+podman run -d --pod monipod \
+ --name influxdb \
+ --env-file configuration.env \
+ -v ./:/imports \
+ -v influxdb_data:/var/lib/influxdb \
+ influxdb:1.8-alpine
+ 
+podman run -d --pod monipod \
+ --name grafana \
+ --env-file configuration.env \
+ --requires influxdb \
+ -v grafana_data:/var/lib/grafana \
+ -v ./grafana/provisioning/:/etc/grafana/provisioning/ \
+ -v ./grafana/provisioning/:/var/lib/grafana/dashboards/ \
+ grafana/grafana:8.0.2
+ 
+podman run -d --pod monipod \
+ -v /path/to/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+ --requires influxdb \
+ telegraf:1.18-alpine

@@ -1,0 +1,33 @@
+pageInfo:
+  title: My homelab
+sections:
+- name: Documentation
+  items:
+  - title: Bookstack
+    description: All my documentation
+    icon: hl-bookstack
+    url: http://bookstack.celleon.xyz
+  - title: Focalboard
+    description: Todo list
+    icon: hl-focalboard
+    url: http://focalboard.celleon.xyz
+- name: Monitoring
+  items:
+  - title: Up-time Kuma
+    description: Status and notifications
+    icon: hl-uptime-kuma
+    url: http://192.168.0.126:3001
+  - title: Grafana
+    description: Grafana dashboard
+    icon: hl-grafana
+- name: Networking
+  items:
+  - title: Pi-hole
+    description: DNS and DHCP servers
+    icon: hl-pihole
+    url: http://pihole.celleon.xyz/admin
+  - title: Nginx Proxy Manager
+    description: Reverse proxy
+    icon: hl-nginxproxymanager
+    url: http://proxy.celleon.xyz:81
+
