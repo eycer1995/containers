@@ -1,0 +1,28 @@
+#! /bin/bash
+
+podman pod create --name gitpod \
+ -p 3000:3000 \
+ -p 2222:22 \
+
+mkdir $PWD/{data,config}
+
+sudo ufw allow 222
+sudo ufw allow 3000
+
+# Provide a mariadb for this pod
+
+podman run -d --pod gitpod \
+ --name gitea \
+ -e USER_GID=1000 \
+ -e USER_UID=1000 \
+ -e GITEA__database__DB_TYPE=mysql \
+ -e GITEA__database__HOST=192.168.0.2:3306 \
+ -e GITEA__database__NAME=gitea_db \
+ -e GITEA__database__USER=gitea_db_user \
+ -e GITEA__database__PASSWD="changeme" \
+ -v $PWD/data:/var/lib/gitea \
+ -v $PWD/config:/etc/gitea \
+ -v /etc/timezone:/etc/timezone:ro \
+ -v /etc/localtime:/etc/localtime:ro \
+ --restart unless-stopped \
+docker.io/gitea/gitea:latest-rootless

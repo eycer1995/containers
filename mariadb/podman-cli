@@ -1,5 +1,13 @@
 #! /bin/bash
 
+# Mariadb container
+# If /my/custom/config-file.cnf is the path and name of
+# your custom configuration file, you can start your mariadb
+# container like this (note that only the directory path
+# of the custom config file is used in this command):
+# -v /my/custom:/etc/mysql/conf.d
+
+
 podman pod create --name mariapod \
 -p 3306:3306
 
