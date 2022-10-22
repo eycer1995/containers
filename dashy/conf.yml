@@ -6,7 +6,7 @@ sections:
   - title: Bookstack
     description: All my documentation
     icon: hl-bookstack
-    url: http://192.168.0.126:6875
+    url: http://192.168.0.103:6875
   - title: Focalboard
     description: Todo list
     icon: hl-focalboard
@@ -14,13 +14,13 @@ sections:
   - title: Gitea
     description: Personal github
     icon: hl-gitea
-    url: http://192.168.0.126:3000
+    url: http://192.168.0.103:3000
 - name: Monitoring
   items:
   - title: Up-time Kuma
     description: Status and notifications
     icon: hl-uptime-kuma
-    url: http://192.168.0.126:3001
+    url: http://192.168.0.103:3001
 - name: Networking
   items:
   - title: Pi-hole
@@ -55,4 +55,14 @@ sections:
     description: only for manga and books
     icon: hl-transmission
     url: http://192.168.0.101:3000
-  
+- name: File Transfer
+  items:
+  - title: Syncthing
+    description: sync files everywhere.
+    icon: hl-syncthing
+    url: http://192.168.0.101:8384
+  - title: Nextcloud
+    description: open source cloud
+    icon: hl-nextcloud
+    url: http://192.168.0.101:7001
+
