@@ -2,7 +2,8 @@
 # Create a dashy instance for ARM64 host
 # you need to provide a conf.yml to work with
 
-podman pod create --name dashpod -p 8080:80 --infra-name dashinf
+podman pod create --name dashpod -p 8080:80
+
 
 touch $PWD/conf.yml
 
@@ -10,4 +11,4 @@ podman run -d --pod dashpod \
  --name dashy \
  -v $PWD/conf.yml:/app/public/conf.yml \
  --restart unless-stopped \
- lissy93/dashy:arm64v8
+docker.io/lissy93/dashy:latest
