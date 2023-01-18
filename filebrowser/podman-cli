@@ -1,0 +1,28 @@
+# Temporary container to browser files on a server
+# will be deleted after stop
+
+mkdir /opt/filebrowser
+
+touch filebrowser.db
+
+sudo podman run --rm \
+    -v /opt/komga:/srv \
+    -v $PWD/filebrowser.db:/database/filebrowser.db \
+    -v $PWD/settings.json:/config/settings.json \
+    -e PUID=$(id -u) \
+    -e PGID=$(id -g) \
+    -p 8080:5000 \
+    docker.io/filebrowser/filebrowser:s6
+
+# filebrowser.db and settings.json should be owned by $USER running the container
+sudo chown eycer:eycer ./*    
+
+$ cat settings.json 
+{
+  "port": 5000,
+  "baseURL": "",
+  "address": "",
+  "log": "stdout",
+  "database": "/database/filebrowser.db",
+  "root": "/srv"
+}
