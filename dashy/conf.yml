@@ -1,32 +1,30 @@
 pageInfo:
   title: My homelab
 sections:
-- name: Documentation
-  items:
-  - title: Bookstack
-    description: All my documentation
-    icon: hl-bookstack
-    url: http://192.168.0.103:6875
-  - title: Focalboard
-    description: Todo list
-    icon: hl-focalboard
-    url: http://focalboard.celleon.xyz
-  - title: Gitea
-    description: Personal github
-    icon: hl-gitea
-    url: http://192.168.0.103:3000
 - name: Monitoring
   items:
   - title: Up-time Kuma
     description: Status and notifications
     icon: hl-uptime-kuma
-    url: http://192.168.0.103:3001
+    url: http://192.168.0.20:4040
+  - title: Proxmox
+    description: VM hypervisor
+    icon: hl-proxmox
+    url: https://192.168.0.104:8006
+  - title: checkmk
+    description: VM metrics and monitoring
+    icon: hl-checkmk
+    url: http://192.168.0.20/monitoring
 - name: Networking
   items:
   - title: Pi-hole
     description: DNS and DHCP servers
     icon: hl-pihole
     url: http://192.168.0.102/admin
+  - title: NGINX Proxy Manager
+    description: reverse proxy
+    icon: hl-nginxproxymanager
+    url: http://192.168.0.102
 - name: Home media server
   items:
   - title: Jellyfin
@@ -49,12 +47,23 @@ sections:
     description: Search for movies
     icon: hl-radarr
     url: http://192.168.0.101:7878
+  - title: Bazarr
+    description: manage and download subtitles
+    icon: hl-bazarr
+    url: http://192.168.0.101:6767
+  - title: Overseerr
+    description: media discovery
+    icon: hl-overseerr
 - name: Comics and Manga
   items:
-  - title: Transmission M&B
-    description: only for manga and books
+  - title: Transmission MAM
+    description: Only for books. Seeding 24/7
     icon: hl-transmission
-    url: http://192.168.0.101:3000
+    url: http://192.168.0.18:3001
+  - title: Komga
+    description: Mange reader
+    icon: hl-komga
+    url: http://192.168.0.18:3232
 - name: File Transfer
   items:
   - title: Syncthing
@@ -64,5 +73,12 @@ sections:
   - title: Nextcloud
     description: open source cloud
     icon: hl-nextcloud
-    url: http://192.168.0.101:7001
-
+    url: http://192.168.0.21:32768
+  - title: Private bin
+    description: open source pastebin
+    icon: hl-privatebin
+    url: http://192.168.0.18:8035
+  - title: Octoprint
+    description: 3D print web interface
+    icon: hl-octoprint
+    url: http://192.168.0.98
