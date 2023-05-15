@@ -1,0 +1,6 @@
+@jellyfin host jellyfin.celleon.xyz
+handle @jellyfin {
+	import localSubnets
+		reverse_proxy @localSubnets http://192.168.0.22:8096
+		
+}

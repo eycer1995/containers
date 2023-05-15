@@ -1,13 +1,22 @@
 #! /bin/bash
 
-podman pod create --name caddypod -p 80:80 -p 443:443 \
+sudo podman pod create --name caddypod \
+	-p 80:80 \
+	-p 443:443 \
+	-p 443:443/udp 
 
-podman run -d --pod caddypod \
- --name caddy \
- -v $PWD/Caddyfile:/etc/caddy/Caddyfile \
- -v $PWD/site:/srv \
- -v caddy_data:/data \
- -v caddy_config:/config \
- caddy:2.5.1-alpine
+# Caddy
+sudo podman run -d --pod caddypod \
+	--name caddy \
+	-v $PWD/config:/etc/caddy \
+	-v /etc/localtime:/etc/localtime:ro \
+	--restart unless-stopped \
+docker.io/caddy:latest
 
-
+# Caddy with cloudflare
+sudo podman run -d --pod caddypod \
+ --name caddy-cloudflared \
+ -v $PWD/config:/etc/caddy \
+ -v /etc/localtime:/etc/localtime:ro \
+ --restart unless-stopped \
+ docker.io/caddy-cloudflare:latest
