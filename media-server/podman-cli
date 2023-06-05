@@ -8,8 +8,12 @@ podman pod create --name mediapod \
  -p 8989:8989 `#sonarr ports` \
  -p 9117:9117 `#jackett ports` \
  -p 7878:7878 `#radarr ports` 
+ -p 5055:5055 `#jellyseer ports` \
+ -p 6767:6767 `#bazarr port` \
 
-# podman rename <mediapodinfra> mediainf
+
+POD_ID=$(podman pod ps | grep mediapod | awk '{print $1}')
+podman rename $POD_ID-infra  mediainf
 
 sudo ufw allow 9091
 sudo ufw allow 51413
@@ -20,12 +24,16 @@ sudo ufw allow 1900
 sudo ufw allow 8989
 sudo ufw allow 9117
 sudo ufw allow 7878
+sudo ufw allow 5055
+sudo ufw allow 6767
 
 # Create all folder scheme
 mkdir -p jellyfin/{config,tvseries,movies,anime,animovies}
 mkdir -p transmission/{config,downloads,watch}
 mkdir -p sonarr/config
 mkdir -p jackett/config
+mkdir -p jellyseerr/config
+mkdir -p bazarr/config
 
 podman run -d --pod mediapod \
   --name=jellyfin \
@@ -34,11 +42,12 @@ podman run -d --pod mediapod \
   -e TZ=America/Argentina/Buenos_Aires \
   -v $PWD/jellyfin/config:/config \
   -v $PWD/jellyfin/tvseries:/data/tvshows \
+  -v $PWD/jellyfin/kdrama:/data/kdrama \
   -v $PWD/jellyfin/movies:/data/movies \
   -v $PWD/jellyfin/anime/:/data/anime \
   -v $PWD/jellyfin/animovies:/data/animovies \
   --restart unless-stopped \
-  lscr.io/linuxserver/jellyfin:arm64v8-10.7.7
+lscr.io/linuxserver/jellyfin:latest
 
 podman run -d --pod mediapod \
   --name=transmission \
@@ -63,7 +72,15 @@ podman run -d --pod mediapod \
   -v $PWD/jellyfin/anime:/tv `#optional` \
   -v $PWD/transmission/downloads:/downloads `#optional` \
   --restart unless-stopped \
-  lscr.io/linuxserver/sonarr:arm64v8-3.0.8
+  lscr.io/linuxserver/sonarr:latest
+
+podman run -d --pod mediapod \
+ --name jellyseerr \
+ -e LOG_LEVEL=debug \
+ -e TZ=America/Argentina/Buenos_Aires \
+ -v $PWD/jellyseerr/config:/app/config \
+ --restart unless-stopped \
+docker.io/fallenbagel/jellyseerr:latest
 
 podman run -d --pod mediapod \
   --name=radarr \
@@ -74,7 +91,19 @@ podman run -d --pod mediapod \
   -v $PWD/jellyfin/movies:/movies `#optional` \
   -v $PWD/transmission/downloads:/downloads `#optional` \
   --restart unless-stopped \
-  lscr.io/linuxserver/radarr:arm64v8-4.1.0
+  lscr.io/linuxserver/radarr:latest
+
+podman run -d --pod mediapod \
+ --name=bazarr \
+ -e PUID=1000 \
+ -e PGID=1000 \
+ -e TZ=America/Argentina/Buenos_Aires \
+ -v $PWD/bazarr/config:/config \
+ -v $PWD/jellyfin/movies:/movies `#optional` \
+ -v $PWD/jellyfin/tvseries:/tv `#optional` \
+ -v $PWD/jellyfin/anime:/anime `#optional` \
+ --restart unless-stopped \
+lscr.io/linuxserver/bazarr:latest
 
 podman run -d --pod mediapod \
   --name=jackett \
