@@ -1,0 +1,134 @@
+#! /bin/bash
+# Update HMS
+HMS_ROOT="/mnt/hades/hms"
+
+echo "Stopping containeres... Removing mediapod"
+podman pod rm -f
+
+echo "Updating all images"
+podman pull lscr.io/linuxserver/jellyfin:latest
+podman pull lscr.io/linuxserver/transmission:latest
+podman pull lscr.io/linuxserver/sonarr:latest
+podman pull lscr.io/linuxserver/radarr:latest
+podman pull lscr.io/linuxserver/jackett:latest
+podman pull docker.io/fallenbagel/jellyseerr:latest
+echo
+
+echo "Creating mediapod..."
+cd $HMS_ROOT
+podman pod create --name mediapod \
+ -p 9091:9091 -p 51413:51413 -p 51413:51413/udp `#transmission ports` \
+ -p 8096:8096 -p 8920:8920 -p 7359:7359 -p 1900:1900 `#jellyfin ports` \
+ -p 8989:8989 `#sonarr ports` \
+ -p 9117:9117 `#jackett ports` \
+ -p 7878:7878 `#radarr ports` \
+ -p 5055:5055 `#jellyseer ports` \
+ -p 6767:6767 `#bazarr port` \
+ -p 8484:8484 `#tvsonarr port`
+
+POD_ID=$(podman pod ps | grep mediapod | awk '{print $1}')
+podman rename $POD_ID-infra  mediainf
+
+
+echo "Creating new containers..."
+echo
+podman run -d --pod mediapod \
+  --name=jellyfin \
+  -e PUID=1000 \
+  -e PGID=1000 \
+  -e TZ=America/Argentina/Buenos_Aires \
+  -v $PWD/jellyfin/config:/config \
+  -v $PWD/jellyfin/tvseries:/data/tvshows \
+  -v $PWD/jellyfin/kdrama:/data/kdrama \
+  -v $PWD/jellyfin/movies:/data/movies \
+  -v $PWD/jellyfin/anime/:/data/anime \
+  -v $PWD/jellyfin/animovies:/data/animovies \
+  --restart unless-stopped \
+lscr.io/linuxserver/jellyfin:latest
+
+podman run -d --pod mediapod \
+  --name=transmission \
+  -e PUID=1000 \
+  -e PGID=1000 \
+  -e TZ=America/Argentina/Buenos_Aires \
+  -e TRANSMISSION_WEB_HOME=/combustion-release/ `#optional` \
+  -e USER=tms_user `#optional` \
+  -e PASS="changeme" `#optional` \
+  -v $PWD/transmission/config:/config \
+  -v $PWD/transmission/downloads:/downloads \
+  -v $PWD/transmission/watch:/watch \
+  --restart unless-stopped \
+linuxserver/transmission:latest
+
+# inside the sonarr container folder "tv" is created as root
+# this won't let you to add the root path for the shows, fix with:
+# chown -R abc:abc tv
+podman run -d --pod mediapod \
+  --name=sonarr \
+  -e PUID=1000 \
+  -e PGID=1000 \
+  -e TZ=America/Argentina/Buenos_Aires \
+  -v $PWD/sonarr/config:/config \
+  -v $PWD/jellyfin/anime:/tv `#optional` \
+  -v $PWD/transmission/downloads:/downloads `#optional` \
+  --restart unless-stopped \
+lscr.io/linuxserver/sonarr:latest
+
+podman run -d --pod mediapod \
+ --name=tvsonarr \
+ -e	PUID=1000 \
+ -e	PGID=1000 \
+ -e	TZ=America/Argentina/Buenos_Aires \
+ -v	$PWD/tvsonarr/config:/config \
+ -v	$PWD/jellyfin/tvseries:/tv \
+ -v	$PWD/transmission/downloads:/downloads \
+ --restart unless-stopped \
+lscr.io/linuxserver/sonarr:latest
+
+podman run -d --pod mediapod \
+ --name jellyseerr \
+ -e LOG_LEVEL=debug \
+ -e TZ=America/Argentina/Buenos_Aires \
+ -v $PWD/jellyseerr/config:/app/config \
+ --restart unless-stopped \
+docker.io/fallenbagel/jellyseerr:latest
+
+podman run -d --pod mediapod \
+  --name=radarr \
+  -e PUID=1000 \
+  -e PGID=1000 \
+  -e TZ=America/Argentina/Buenos_Aires \
+  -v $PWD/radarr/config:/config \
+  -v $PWD/jellyfin/movies:/movies `#optional` \
+  -v $PWD/transmission/downloads:/downloads `#optional` \
+  --restart unless-stopped \
+  lscr.io/linuxserver/radarr:latest
+
+podman run -d --pod mediapod \
+ --name=bazarr \
+ -e PUID=1000 \
+ -e PGID=1000 \
+ -e TZ=America/Argentina/Buenos_Aires \
+ -v $PWD/bazarr/config:/config \
+ -v $PWD/jellyfin/movies:/movies `#optional` \
+ -v $PWD/jellyfin/tvseries:/tv `#optional` \
+ -v $PWD/jellyfin/anime:/anime `#optional` \
+ --restart unless-stopped \
+lscr.io/linuxserver/bazarr:latest
+
+podman run -d --pod mediapod \
+  --name=jackett \
+  -e PUID=1000 \
+  -e PGID=1000 \
+  -e TZ=America/Argentina/Buenos_Aires \
+  -e AUTO_UPDATE=true `#optional` \
+  -v $PWD/jackett/config:/config \
+  -v $PWD/transmission/downloads:/downloads \
+  --restart unless-stopped \
+  lscr.io/linuxserver/jackett:latest
+
+echo "Clean old and unused images"
+podman image prune -f
+
+echo
+echo "Done."
