@@ -1,0 +1,133 @@
+appConfig:
+  theme: fallout
+  language: en
+  layout: auto
+  iconSize: small
+pageInfo:
+  title: My homelab
+  description: ''
+  navLinks: []
+  footerText: ''
+sections:
+  - name: Monitoring
+    items:
+      - title: Up-time Kuma
+        description: Status and notifications
+        icon: hl-uptime-kuma
+        url: http://192.168.0.20:4040
+        id: 0_1062_uptimekuma
+      - title: Proxmox
+        description: VM hypervisor
+        icon: hl-proxmox
+        url: https://192.168.0.104:8006
+        id: 1_1062_proxmox
+      - title: checkmk
+        description: VM metrics and monitoring
+        icon: hl-checkmk
+        url: http://192.168.0.20/monitoring
+        id: 2_1062_checkmk
+  - name: Networking
+    items:
+      - title: Pi-hole
+        description: DNS and DHCP servers
+        icon: hl-pihole
+        url: http://192.168.0.157/admin
+        id: 0_1064_pihole
+      - title: NPM
+        description: reverse proxy
+        icon: hl-nginxproxymanager
+        url: http://192.168.0.21:81
+        id: 1_1064_npm
+      - title: Wireguard
+        description: PiVPN to access from outside
+        icon: hl-wireguard
+        url: http://192.168.0.26:10086
+        id: 2_1064_wireguard
+  - name: Home media server
+    items:
+      - title: Jellyfin
+        description: Play all media
+        icon: hl-jellyfin
+        url: http://192.168.0.101:8096
+        id: 0_1632_jellyfin
+      - title: Sonarr
+        description: Search for TV shows
+        icon: hl-sonarr
+        url: http://192.168.0.101:8989
+        id: 1_1632_sonarr
+      - title: Jackett
+        description: Indexers for torrent search
+        icon: hl-jackett
+        url: http://192.168.0.101:9117
+        id: 2_1632_jackett
+      - title: Transmission
+        description: Torrent client
+        icon: hl-transmission
+        url: http://192.168.0.101:9091
+        id: 3_1632_transmission
+      - title: Radarr
+        description: Search for movies
+        icon: hl-radarr
+        url: http://192.168.0.101:7878
+        id: 4_1632_radarr
+      - title: Bazarr
+        description: manage and download subtitles
+        icon: hl-bazarr
+        url: http://192.168.0.101:6767
+        id: 5_1632_bazarr
+      - title: Jellyseerr
+        description: Search for content
+        icon: hl-jellyseerr
+        url: http://192.168.0.101:5055
+        id: 6_1632_jellyseerr
+  - name: Comics and Manga
+    items:
+      - title: Transmission MAM
+        description: Only for books. Seeding 24/7
+        icon: hl-transmission
+        url: http://192.168.0.18:3001
+        id: 0_1461_transmissionmam
+      - title: Kavita
+        description: Mange reader
+        icon: hl-kavita
+        url: http://192.168.0.24:4747
+        id: 1_1461_kavita
+  - name: File Transfer
+    items:
+      - title: Syncthing
+        description: sync files everywhere.
+        icon: hl-syncthing
+        url: http://192.168.0.101:8384
+        id: 0_1253_syncthing
+      - title: Nextcloud
+        description: open source cloud
+        icon: hl-nextcloud
+        url: http://192.168.0.21:32768
+        id: 1_1253_nextcloud
+      - title: Private bin
+        description: open source pastebin
+        icon: hl-privatebin
+        url: http://192.168.0.18:8035
+        id: 2_1253_privatebin
+  - name: Misc
+    items:
+      - title: Gitea
+        description: personal github
+        icon: hl-gitea
+        url: http://192.168.0.18:3004
+        id: 0_396_gitea
+      - title: Octoprint
+        description: 3D print web interface
+        icon: hl-octoprint
+        url: http://192.168.0.98
+        id: 1_396_octoprint
+      - title: Chat Bot
+        description: chatbot-ui
+        icon: hl-chatgpt
+        url: http://192.168.0.18:3030
+        id: 2_396_chatbot
+      - title: seedbox
+        description: only for private trackers
+        icon: hl-transmission
+        url: http://192.168.0.23:9091
+        id: 3_396_seedbox

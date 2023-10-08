@@ -82,3 +82,50 @@ sections:
     description: 3D print web interface
     icon: hl-octoprint
     url: http://192.168.0.98
+- name: Proxmox Glances
+  widgets:
+    - type: gl-current-cpu
+      options:
+        hostname: http://192.168.0.104:61208
+    - type: gl-current-cores
+      options:
+        hostname: http://192.168.0.104:61208
+    - type: gl-cpu-history
+      options:
+        hostname: http://192.168.0.104:61208
+        limit: 60
+    - type: gl-current-mem
+      options:
+        hostname: http://192.168.0.104:61208
+    - type: gl-mem-history
+      options:
+        hostname: http://192.168.0.104:61208
+        limit: 80
+    - type: gl-disk-space
+      options:
+        hostname: http://192.168.0.104:61208
+    - type: gl-disk-io
+      options:
+        hostname: http://192.168.0.104:61208
+    - type: gl-system-load
+      options:
+        hostname: http://192.168.0.104:61208
+    - type: gl-load-history
+      options:
+        hostname: http://192.168.0.104:61208
+    - type: gl-network-interfaces
+      options:
+        hostname: http://192.168.0.104:61208
+    - type: gl-network-traffic
+      options:
+        hostname: http://192.168.0.104:61208
+        limit: 500
+    - type: gl-alerts
+      options:
+        hostname: http://192.168.0.104:61208
+    - type: gl-cpu-temp
+      options:
+        hostname: http://192.168.0.104:61208
+        units: C
+
+

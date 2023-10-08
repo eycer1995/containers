@@ -1,16 +1,17 @@
 #! /bin/bash
 # Create a full home media server for ARM64 host
 # apps > jellyfin, transmission, sonarr, jackett.
+HMS_ROOT="/mnt/hades/hms"
 
 podman pod create --name mediapod \
  -p 9091:9091 -p 51413:51413 -p 51413:51413/udp `#transmission ports` \
  -p 8096:8096 -p 8920:8920 -p 7359:7359 -p 1900:1900 `#jellyfin ports` \
  -p 8989:8989 `#sonarr ports` \
  -p 9117:9117 `#jackett ports` \
- -p 7878:7878 `#radarr ports` 
+ -p 7878:7878 `#radarr ports` \
  -p 5055:5055 `#jellyseer ports` \
  -p 6767:6767 `#bazarr port` \
-
+ -p 8484:8989 `#tvsonarr port`
 
 POD_ID=$(podman pod ps | grep mediapod | awk '{print $1}')
 podman rename $POD_ID-infra  mediainf
@@ -26,14 +27,17 @@ sudo ufw allow 9117
 sudo ufw allow 7878
 sudo ufw allow 5055
 sudo ufw allow 6767
+sudo ufw allow 8484
 
 # Create all folder scheme
+cd $HMS_ROOT
 mkdir -p jellyfin/{config,tvseries,movies,anime,animovies}
 mkdir -p transmission/{config,downloads,watch}
 mkdir -p sonarr/config
 mkdir -p jackett/config
 mkdir -p jellyseerr/config
 mkdir -p bazarr/config
+mkdir -p tvsonarr/config
 
 podman run -d --pod mediapod \
   --name=jellyfin \
@@ -63,6 +67,9 @@ podman run -d --pod mediapod \
   --restart unless-stopped \
 linuxserver/transmission:latest
 
+# inside the sonarr container folder "tv" is created as root
+# this won't let you to add the root path for the shows, fix with:
+# chown -R abc:abc tv
 podman run -d --pod mediapod \
   --name=sonarr \
   -e PUID=1000 \
@@ -72,7 +79,18 @@ podman run -d --pod mediapod \
   -v $PWD/jellyfin/anime:/tv `#optional` \
   -v $PWD/transmission/downloads:/downloads `#optional` \
   --restart unless-stopped \
-  lscr.io/linuxserver/sonarr:latest
+lscr.io/linuxserver/sonarr:latest
+
+podman run -d --pod mediapod \
+ --name=tvsonarr \
+ -e	PUID=1000 \
+ -e	PGID=1000 \
+ -e	TZ=America/Argentina/Buenos_Aires \
+ -v	$PWD/tvsonarr/config:/config \
+ -v	$PWD/jellyfin/tvseries:/tv \
+ -v	$PWD/transmission/downloads:/downloads \
+ --restart unless-stopped \
+lscr.io/linuxserver/sonarr:latest
 
 podman run -d --pod mediapod \
  --name jellyseerr \
