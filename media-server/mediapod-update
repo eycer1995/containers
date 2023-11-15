@@ -3,7 +3,7 @@
 HMS_ROOT="/mnt/hades/hms"
 
 echo "Stopping containeres... Removing mediapod"
-podman pod rm -f
+podman pod rm -f mediapod
 
 echo "Updating all images"
 podman pull lscr.io/linuxserver/jellyfin:latest
@@ -12,9 +12,11 @@ podman pull lscr.io/linuxserver/sonarr:latest
 podman pull lscr.io/linuxserver/radarr:latest
 podman pull lscr.io/linuxserver/jackett:latest
 podman pull docker.io/fallenbagel/jellyseerr:latest
+
+echo
+echo "Creating mediapod..."
 echo
 
-echo "Creating mediapod..."
 cd $HMS_ROOT
 podman pod create --name mediapod \
  -p 9091:9091 -p 51413:51413 -p 51413:51413/udp `#transmission ports` \
@@ -29,9 +31,10 @@ podman pod create --name mediapod \
 POD_ID=$(podman pod ps | grep mediapod | awk '{print $1}')
 podman rename $POD_ID-infra  mediainf
 
-
+echo
 echo "Creating new containers..."
 echo
+
 podman run -d --pod mediapod \
   --name=jellyfin \
   -e PUID=1000 \
@@ -53,7 +56,7 @@ podman run -d --pod mediapod \
   -e TZ=America/Argentina/Buenos_Aires \
   -e TRANSMISSION_WEB_HOME=/combustion-release/ `#optional` \
   -e USER=tms_user `#optional` \
-  -e PASS="changeme" `#optional` \
+  -e PASS="DixhpAAbOrMgd5Qz5Z7CwAJLspBSLD2U1gcwaw8C5sTTKB8c9WucrHORxKEtF3B3" `#optional` \
   -v $PWD/transmission/config:/config \
   -v $PWD/transmission/downloads:/downloads \
   -v $PWD/transmission/watch:/watch \
