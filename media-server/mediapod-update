@@ -1,6 +1,6 @@
 #! /bin/bash
 # Update HMS
-HMS_ROOT="/mnt/hades/hms"
+HMS_ROOT="/opt/hms"
 
 echo "Stopping containeres... Removing mediapod"
 podman pod rm -f mediapod
@@ -12,6 +12,7 @@ podman pull lscr.io/linuxserver/sonarr:latest
 podman pull lscr.io/linuxserver/radarr:latest
 podman pull lscr.io/linuxserver/jackett:latest
 podman pull docker.io/fallenbagel/jellyseerr:latest
+podman pull lscr.io/linuxserver/bazarr:latest
 
 echo
 echo "Creating mediapod..."
@@ -54,9 +55,8 @@ podman run -d --pod mediapod \
   -e PUID=1000 \
   -e PGID=1000 \
   -e TZ=America/Argentina/Buenos_Aires \
-  -e TRANSMISSION_WEB_HOME=/combustion-release/ `#optional` \
   -e USER=tms_user `#optional` \
-  -e PASS="DixhpAAbOrMgd5Qz5Z7CwAJLspBSLD2U1gcwaw8C5sTTKB8c9WucrHORxKEtF3B3" `#optional` \
+  -e PASS="changeme" `#optional` \
   -v $PWD/transmission/config:/config \
   -v $PWD/transmission/downloads:/downloads \
   -v $PWD/transmission/watch:/watch \

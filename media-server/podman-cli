@@ -1,7 +1,7 @@
 #! /bin/bash
 # Create a full home media server for ARM64 host
 # apps > jellyfin, transmission, sonarr, jackett.
-HMS_ROOT="/mnt/hades/hms"
+HMS_ROOT="/opt/hms"
 
 podman pod create --name mediapod \
  -p 9091:9091 -p 51413:51413 -p 51413:51413/udp `#transmission ports` \
@@ -31,13 +31,14 @@ sudo ufw allow 8484
 
 # Create all folder scheme
 cd $HMS_ROOT
-mkdir -p jellyfin/{config,tvseries,movies,anime,animovies}
+mkdir -p jellyfin/{config,tvseries,movies,anime,animovies,kdrama}
 mkdir -p transmission/{config,downloads,watch}
 mkdir -p sonarr/config
 mkdir -p jackett/config
 mkdir -p jellyseerr/config
 mkdir -p bazarr/config
 mkdir -p tvsonarr/config
+mkdir -p radarr/config
 
 podman run -d --pod mediapod \
   --name=jellyfin \
@@ -58,7 +59,6 @@ podman run -d --pod mediapod \
   -e PUID=1000 \
   -e PGID=1000 \
   -e TZ=America/Argentina/Buenos_Aires \
-  -e TRANSMISSION_WEB_HOME=/combustion-release/ `#optional` \
   -e USER=tms_user `#optional` \
   -e PASS="changeme" `#optional` \
   -v $PWD/transmission/config:/config \
@@ -81,6 +81,8 @@ podman run -d --pod mediapod \
   --restart unless-stopped \
 lscr.io/linuxserver/sonarr:latest
 
+# After running you need to change the used port to avoid conflict with "sonarr" container
+# In the config.xml change 8989 to 8484
 podman run -d --pod mediapod \
  --name=tvsonarr \
  -e	PUID=1000 \
