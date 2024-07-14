@@ -2,10 +2,25 @@
 # Update HMS
 HMS_ROOT="/opt/hms"
 
-echo "Stopping containeres... Removing mediapod"
-podman pod rm -f mediapod
+systemctl --user stop pod-mediapod.service
+systemctl --user disable pod-mediapod.service
+sleep 5
 
-echo "Updating all images"
+
+if ! systemctl --user is-active --quiet pod-mediapod.service; then
+	echo "Stopping containers... Removing mediapod"
+	podman pod rm -f mediapod
+else
+	echo "Service pod-mediapod is still running."
+	exit 1
+fi
+
+echo "Deleting systemd unit files..."
+
+rm -r ~/.config/systemd/user/*
+sleep 5
+
+echo "Updating all images..."
 podman pull lscr.io/linuxserver/jellyfin:latest
 podman pull lscr.io/linuxserver/transmission:latest
 podman pull lscr.io/linuxserver/sonarr:latest
@@ -36,7 +51,7 @@ echo
 echo "Creating new containers..."
 echo
 
-podman run -d --pod mediapod \
+podman create --pod mediapod \
   --name=jellyfin \
   -e PUID=1000 \
   -e PGID=1000 \
@@ -50,7 +65,7 @@ podman run -d --pod mediapod \
   --restart unless-stopped \
 lscr.io/linuxserver/jellyfin:latest
 
-podman run -d --pod mediapod \
+podman create --pod mediapod \
   --name=transmission \
   -e PUID=1000 \
   -e PGID=1000 \
@@ -66,7 +81,7 @@ linuxserver/transmission:latest
 # inside the sonarr container folder "tv" is created as root
 # this won't let you to add the root path for the shows, fix with:
 # chown -R abc:abc tv
-podman run -d --pod mediapod \
+podman create --pod mediapod \
   --name=sonarr \
   -e PUID=1000 \
   -e PGID=1000 \
@@ -77,7 +92,7 @@ podman run -d --pod mediapod \
   --restart unless-stopped \
 lscr.io/linuxserver/sonarr:latest
 
-podman run -d --pod mediapod \
+podman create --pod mediapod \
  --name=tvsonarr \
  -e	PUID=1000 \
  -e	PGID=1000 \
@@ -88,7 +103,7 @@ podman run -d --pod mediapod \
  --restart unless-stopped \
 lscr.io/linuxserver/sonarr:latest
 
-podman run -d --pod mediapod \
+podman create --pod mediapod \
  --name jellyseerr \
  -e LOG_LEVEL=debug \
  -e TZ=America/Argentina/Buenos_Aires \
@@ -96,7 +111,7 @@ podman run -d --pod mediapod \
  --restart unless-stopped \
 docker.io/fallenbagel/jellyseerr:latest
 
-podman run -d --pod mediapod \
+podman create --pod mediapod \
   --name=radarr \
   -e PUID=1000 \
   -e PGID=1000 \
@@ -107,7 +122,7 @@ podman run -d --pod mediapod \
   --restart unless-stopped \
   lscr.io/linuxserver/radarr:latest
 
-podman run -d --pod mediapod \
+podman create --pod mediapod \
  --name=bazarr \
  -e PUID=1000 \
  -e PGID=1000 \
@@ -119,7 +134,7 @@ podman run -d --pod mediapod \
  --restart unless-stopped \
 lscr.io/linuxserver/bazarr:latest
 
-podman run -d --pod mediapod \
+podman create --pod mediapod \
   --name=jackett \
   -e PUID=1000 \
   -e PGID=1000 \
@@ -129,6 +144,21 @@ podman run -d --pod mediapod \
   -v $PWD/transmission/downloads:/downloads \
   --restart unless-stopped \
   lscr.io/linuxserver/jackett:latest
+
+
+echo "Recreate systemd unit files"
+
+cd ~/.config/systemd/user/
+podman generate systemd --files --name mediapod
+sleep 3
+
+echo "Starting mediapod..."
+
+systemctl --user daemon-reload
+systemctl --user enable pod-mediapod.service
+systemctl --user start pod-mediapod.service
+systemctl --user status pod-mediapod.service
+
 
 echo "Clean old and unused images"
 podman image prune -f
